@@ -16,3 +16,9 @@ export enum Direction {
   LEFT = 'LEFT',
   RIGHT = 'RIGHT',
 }
+
+export interface Quote {
+  id?: string;
+  author?: string;
+  content?: string;
+}

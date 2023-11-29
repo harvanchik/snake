@@ -2,7 +2,7 @@ import * as React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {Colors} from '../styles/colors';
 import {PanGestureHandler} from 'react-native-gesture-handler';
-import {Coordinate, Direction, GestureEventType} from '../types/types';
+import {Coordinate, Direction, GestureEventType, Quote} from '../types/types';
 import Worm from './Worm';
 import {checkGameOver} from '../utils/checkGameOver';
 import Predator from './Predator';
@@ -10,6 +10,7 @@ import {checkEatsPredator} from '../utils/checkEatPredator';
 import {randomPredatorPosition} from '../utils/randomPredatorPosition';
 import {Text} from 'react-native';
 import Header from './Header';
+import {getRandomQuote} from '../utils/getRandomQuote';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
 const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 71};
@@ -28,6 +29,7 @@ export default function Game(): JSX.Element {
   const [isGameOver, setGameOver] = React.useState<boolean>(false);
   const [isPaused, setPaused] = React.useState<boolean>(false);
   const [score, setScore] = React.useState<number>(0);
+  const [quote, setQuote] = React.useState<Quote>({content: '', author: ''});
 
   React.useEffect(() => {
     if (!isGameOver) {
@@ -45,6 +47,8 @@ export default function Game(): JSX.Element {
     // game over
     if (checkGameOver(wormHead, GAME_BOUNDS)) {
       setGameOver(prev => !prev);
+      // random quote api
+      fetchRandomQuote();
       // stop here
       return;
     }
@@ -82,7 +86,6 @@ export default function Game(): JSX.Element {
 
   const handleGesture = (event: GestureEventType) => {
     const {translationX, translationY} = event.nativeEvent;
-    console.log(translationX, translationY);
 
     if (Math.abs(translationX) > Math.abs(translationY)) {
       if (translationX > 0) {
@@ -116,6 +119,16 @@ export default function Game(): JSX.Element {
     setPaused(!isPaused);
   };
 
+  const fetchRandomQuote = async () => {
+    try {
+      const randomQuote = await getRandomQuote();
+      setQuote(randomQuote);
+    } catch (error) {
+      // Handle the error as needed
+      console.error('Error in component:', error);
+    }
+  };
+
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <SafeAreaView style={styles.container}>
@@ -147,6 +160,20 @@ export default function Game(): JSX.Element {
                 color: Colors.primary,
               }}>
               GAME OVER
+            </Text>
+          )}
+
+          {isGameOver && (
+            <Text
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                textAlignVertical: 'center',
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: Colors.secondary,
+              }}>
+              "{quote.content}" - {quote.author}
             </Text>
           )}
         </View>
