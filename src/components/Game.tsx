@@ -29,6 +29,7 @@ export default function Game(): JSX.Element {
   const [isGameOver, setGameOver] = React.useState<boolean>(false);
   const [isPaused, setPaused] = React.useState<boolean>(false);
   const [score, setScore] = React.useState<number>(0);
+  const [highScore, setHighScore] = React.useState<number>(0);
   const [quote, setQuote] = React.useState<Quote>({content: '', author: ''});
 
   React.useEffect(() => {
@@ -49,6 +50,10 @@ export default function Game(): JSX.Element {
       setGameOver(prev => !prev);
       // random quote api
       fetchRandomQuote();
+      // if score is higher than high score, set high score
+      if (score > highScore) {
+        setHighScore(score);
+      }
       // stop here
       return;
     }
@@ -79,6 +84,10 @@ export default function Game(): JSX.Element {
 
       // increase score
       setScore(score + 1);
+      // update high score if needed
+      if (score + 1 > highScore) {
+        setHighScore(score + 1);
+      }
     } else {
       setWorm([newHead, ...worm.slice(0, -1)]);
     }
@@ -142,7 +151,7 @@ export default function Game(): JSX.Element {
               fontWeight: 'bold',
               color: Colors.primary,
             }}>
-            {score}
+            {score} | H: {highScore}
           </Text>
         </Header>
         <View style={styles.boundaries}>
