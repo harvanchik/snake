@@ -4,10 +4,11 @@ import {Colors} from '../styles/colors';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 import {Coordinate, Direction, GestureEventType} from '../types/types';
 import Worm from './Worm';
+import {checkGameOver} from '../utils/checkGameOver';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
 const BIRD_INITIAL_POSITION = {x: 5, y: 20};
-const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 63};
+const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 71};
 const MOVE_INTERVAL = 50;
 
 export default function Game(): JSX.Element {
@@ -31,6 +32,11 @@ export default function Game(): JSX.Element {
     const newHead = {...wormHead};
 
     // game over
+    if (checkGameOver(wormHead, GAME_BOUNDS)) {
+      setGameOver(prev => !prev);
+      // stop here
+      return;
+    }
 
     switch (direction) {
       case Direction.UP:
@@ -49,7 +55,9 @@ export default function Game(): JSX.Element {
         break;
     }
 
-    setWorm([newHead, ...worm]);
+    // if worm eats bird, grow snake
+
+    setWorm([newHead, ...worm.slice(0, -1)]);
   };
 
   const handleGesture = (event: GestureEventType) => {
