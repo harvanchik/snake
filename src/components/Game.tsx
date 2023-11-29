@@ -5,18 +5,27 @@ import {PanGestureHandler} from 'react-native-gesture-handler';
 import {Coordinate, Direction, GestureEventType} from '../types/types';
 import Worm from './Worm';
 import {checkGameOver} from '../utils/checkGameOver';
+import Predator from './Predator';
+import {checkEatsPredator} from '../utils/checkEatPredator';
+import {randomPredatorPosition} from '../utils/randomPredatorPosition';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
-const BIRD_INITIAL_POSITION = {x: 5, y: 20};
 const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 71};
+const PREDATOR_INITIAL_POSITION = randomPredatorPosition(
+  GAME_BOUNDS.maxX,
+  GAME_BOUNDS.maxY,
+);
 const MOVE_INTERVAL = 50;
 
 export default function Game(): JSX.Element {
   const [direction, setDirection] = React.useState<Direction>(Direction.RIGHT);
   const [worm, setWorm] = React.useState<Coordinate[]>(WORM_INITIAL_POSITION);
-  const [bird, setBird] = React.useState<Coordinate>(BIRD_INITIAL_POSITION);
+  const [predator, setPredator] = React.useState<Coordinate>(
+    PREDATOR_INITIAL_POSITION,
+  );
   const [isGameOver, setGameOver] = React.useState<boolean>(false);
   const [isPaused, setPaused] = React.useState<boolean>(false);
+  const [score, setScore] = React.useState<number>(0);
 
   React.useEffect(() => {
     if (!isGameOver) {
@@ -55,9 +64,18 @@ export default function Game(): JSX.Element {
         break;
     }
 
-    // if worm eats bird, grow snake
+    // if worm eats predator
+    if (checkEatsPredator(newHead, predator, 2)) {
+      // create new predator
+      setPredator(randomPredatorPosition(GAME_BOUNDS.maxX, GAME_BOUNDS.maxY));
 
-    setWorm([newHead, ...worm.slice(0, -1)]);
+      setWorm([newHead, ...worm]);
+
+      // increase score
+      setScore(score + 1);
+    } else {
+      setWorm([newHead, ...worm.slice(0, -1)]);
+    }
   };
 
   const handleGesture = (event: GestureEventType) => {
@@ -88,6 +106,7 @@ export default function Game(): JSX.Element {
       <SafeAreaView style={styles.container}>
         <View style={styles.boundaries}>
           <Worm worm={worm} />
+          <Predator x={predator.x} y={predator.y} />
         </View>
       </SafeAreaView>
     </PanGestureHandler>
