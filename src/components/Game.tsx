@@ -8,6 +8,8 @@ import {checkGameOver} from '../utils/checkGameOver';
 import Predator from './Predator';
 import {checkEatsPredator} from '../utils/checkEatPredator';
 import {randomPredatorPosition} from '../utils/randomPredatorPosition';
+import {Text} from 'react-native';
+import Header from './Header';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
 const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 71};
@@ -101,12 +103,52 @@ export default function Game(): JSX.Element {
     }
   };
 
+  const restartGame = () => {
+    setWorm(WORM_INITIAL_POSITION);
+    setPredator(randomPredatorPosition(GAME_BOUNDS.maxX, GAME_BOUNDS.maxY));
+    setDirection(Direction.RIGHT);
+    setGameOver(false);
+    setScore(0);
+    setPaused(false);
+  };
+
+  const pauseGame = () => {
+    setPaused(!isPaused);
+  };
+
   return (
     <PanGestureHandler onGestureEvent={handleGesture}>
       <SafeAreaView style={styles.container}>
+        <Header
+          isPaused={isPaused}
+          pauseGame={pauseGame}
+          restartGame={restartGame}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: 'bold',
+              color: Colors.primary,
+            }}>
+            {score}
+          </Text>
+        </Header>
         <View style={styles.boundaries}>
           <Worm worm={worm} />
           <Predator x={predator.x} y={predator.y} />
+          {/* show game over title in middle of screen is game is over */}
+          {isGameOver && (
+            <Text
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                textAlignVertical: 'center',
+                fontSize: 50,
+                fontWeight: 'bold',
+                color: Colors.primary,
+              }}>
+              GAME OVER
+            </Text>
+          )}
         </View>
       </SafeAreaView>
     </PanGestureHandler>
