@@ -13,7 +13,7 @@ import Header from './Header';
 import {getRandomQuote} from '../utils/getRandomQuote';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
-const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 71};
+const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 59};
 const PREDATOR_INITIAL_POSITION = randomPredatorPosition(
   GAME_BOUNDS.maxX,
   GAME_BOUNDS.maxY,
