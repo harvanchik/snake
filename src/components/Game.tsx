@@ -38,6 +38,7 @@ export default function Game(): JSX.Element {
   const [score, setScore] = React.useState<number>(0);
   const [highScore, setHighScore] = React.useState<number>(0);
   const [quote, setQuote] = React.useState<Quote>({content: '', author: ''});
+  const [allowTeleport, setAllowTeleport] = React.useState<boolean>(true);
 
   // const [{x, y, z}, setData] = useState({x: 0, y: 0, z: 0});
 
@@ -54,11 +55,30 @@ export default function Game(): JSX.Element {
 
   setUpdateIntervalForType(SensorTypes.accelerometer, 100);
 
+  const lastTeleportTime = React.useRef(Date.now());
+
   const subscription = accelerometer.subscribe(({x, y, z, timestamp}) => {
-    // if shake detected
-    if (Math.abs(x) > 5.6 || Math.abs(y) > 7.8 || Math.abs(z) > 2.6) {
-      // console log shake
-      console.log('shake');
+    // if game not paused
+    if (!isPaused && allowTeleport) {
+      // if shake detected
+      if (Math.abs(x) > 8 || Math.abs(y) > 8 || Math.abs(z) > 8) {
+        const now = Date.now();
+        // Ensure at least 5 seconds have passed since the last teleport
+        if (now - lastTeleportTime.current >= 5000) {
+          // teleport worm to random location on board
+          setWorm([
+            {
+              x: Math.floor(Math.random() * (GAME_BOUNDS.maxX - 1)),
+              y: Math.floor(Math.random() * (GAME_BOUNDS.maxY - 1)),
+            },
+          ]);
+          lastTeleportTime.current = now;
+        }
+        setAllowTeleport(false);
+        setTimeout(() => {
+          setAllowTeleport(true);
+        }, 5000);
+      }
     }
   });
 
