@@ -13,6 +13,11 @@ import Header from './Header';
 import {getRandomQuote} from '../utils/getRandomQuote';
 import {useNavigation} from '@react-navigation/native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {
+  SensorTypes,
+  accelerometer,
+  setUpdateIntervalForType,
+} from 'react-native-sensors';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
 const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 59};
@@ -34,6 +39,8 @@ export default function Game(): JSX.Element {
   const [highScore, setHighScore] = React.useState<number>(0);
   const [quote, setQuote] = React.useState<Quote>({content: '', author: ''});
 
+  // const [{x, y, z}, setData] = useState({x: 0, y: 0, z: 0});
+
   const navigation = useNavigation();
 
   React.useEffect(() => {
@@ -44,6 +51,16 @@ export default function Game(): JSX.Element {
       return () => clearInterval(intervalId);
     }
   }, [worm, isGameOver, isPaused]);
+
+  setUpdateIntervalForType(SensorTypes.accelerometer, 100);
+
+  const subscription = accelerometer.subscribe(({x, y, z, timestamp}) => {
+    // if shake detected
+    if (Math.abs(x) > 5.6 || Math.abs(y) > 7.8 || Math.abs(z) > 2.6) {
+      // console log shake
+      console.log('shake');
+    }
+  });
 
   const moveWorm = () => {
     const wormHead = worm[0];
