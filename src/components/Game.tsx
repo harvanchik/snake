@@ -11,6 +11,8 @@ import {randomPredatorPosition} from '../utils/randomPredatorPosition';
 import {Text} from 'react-native';
 import Header from './Header';
 import {getRandomQuote} from '../utils/getRandomQuote';
+import {useNavigation} from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const WORM_INITIAL_POSITION = [{x: 5, y: 5}];
 const GAME_BOUNDS = {minX: 0, maxX: 35, minY: 0, maxY: 59};
@@ -18,7 +20,7 @@ const PREDATOR_INITIAL_POSITION = randomPredatorPosition(
   GAME_BOUNDS.maxX,
   GAME_BOUNDS.maxY,
 );
-const MOVE_INTERVAL = 50;
+const MOVE_INTERVAL = 40;
 
 export default function Game(): JSX.Element {
   const [direction, setDirection] = React.useState<Direction>(Direction.RIGHT);
@@ -31,6 +33,8 @@ export default function Game(): JSX.Element {
   const [score, setScore] = React.useState<number>(0);
   const [highScore, setHighScore] = React.useState<number>(0);
   const [quote, setQuote] = React.useState<Quote>({content: '', author: ''});
+
+  const navigation = useNavigation();
 
   React.useEffect(() => {
     if (!isGameOver) {
@@ -124,6 +128,11 @@ export default function Game(): JSX.Element {
     setPaused(false);
   };
 
+  const goToAbout = () => {
+    // navigate to the about page
+    navigation.navigate('About');
+  };
+
   const pauseGame = () => {
     setPaused(!isPaused);
   };
@@ -139,55 +148,58 @@ export default function Game(): JSX.Element {
   };
 
   return (
-    <PanGestureHandler onGestureEvent={handleGesture}>
-      <SafeAreaView style={styles.container}>
-        <Header
-          isPaused={isPaused}
-          pauseGame={pauseGame}
-          restartGame={restartGame}>
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: 'bold',
-              color: Colors.primary,
-            }}>
-            {score} | H: {highScore}
-          </Text>
-        </Header>
-        <View style={styles.boundaries}>
-          <Worm worm={worm} />
-          <Predator x={predator.x} y={predator.y} />
-          {/* show game over title in middle of screen is game is over */}
-          {isGameOver && (
+    <GestureHandlerRootView style={{flex: 1}}>
+      <PanGestureHandler onGestureEvent={handleGesture}>
+        <SafeAreaView style={styles.container}>
+          <Header
+            isPaused={isPaused}
+            pauseGame={pauseGame}
+            restartGame={restartGame}
+            goToAbout={goToAbout}>
             <Text
               style={{
-                flex: 1,
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                fontSize: 50,
+                fontSize: 22,
                 fontWeight: 'bold',
                 color: Colors.primary,
               }}>
-              GAME OVER
+              {score} | H: {highScore}
             </Text>
-          )}
+          </Header>
+          <View style={styles.boundaries}>
+            <Worm worm={worm} />
+            <Predator x={predator.x} y={predator.y} />
+            {/* show game over title in middle of screen is game is over */}
+            {isGameOver && (
+              <Text
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                  fontSize: 50,
+                  fontWeight: 'bold',
+                  color: Colors.primary,
+                }}>
+                GAME OVER
+              </Text>
+            )}
 
-          {isGameOver && (
-            <Text
-              style={{
-                flex: 1,
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: Colors.secondary,
-              }}>
-              "{quote.content}" - {quote.author}
-            </Text>
-          )}
-        </View>
-      </SafeAreaView>
-    </PanGestureHandler>
+            {isGameOver && (
+              <Text
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  color: Colors.secondary,
+                }}>
+                "{quote.content}" - {quote.author}
+              </Text>
+            )}
+          </View>
+        </SafeAreaView>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 }
 

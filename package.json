@@ -37,7 +37,7 @@
   "name": "snake",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "react-native run-android --port=1234",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",

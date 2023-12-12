@@ -4,6 +4,7 @@ import {Colors} from '../styles/colors';
 interface HeaderProps {
   restartGame: () => void;
   pauseGame: () => void;
+  goToAbout: () => void;
   children: JSX.Element;
   isPaused: boolean;
 }
@@ -12,6 +13,7 @@ export default function Header({
   children,
   restartGame,
   pauseGame,
+  goToAbout,
   isPaused,
 }: HeaderProps): JSX.Element {
   return (
@@ -22,6 +24,9 @@ export default function Header({
 
       <TouchableOpacity onPress={pauseGame}>
         <Text>{isPaused ? 'PLAY' : 'PAUSE'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={goToAbout}>
+        <Text>ABOUT</Text>
       </TouchableOpacity>
       {children}
     </View>
